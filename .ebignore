@@ -1,6 +1,7 @@
-venv/
-.env
-*.pyc
-__pycache__/
+echo "venv/
 .git/
-.gitignore
+.github/
+__pycache__/
+*.pyc
+.DS_Store
+.env" > .ebignore
