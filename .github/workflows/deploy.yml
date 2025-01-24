@@ -1,4 +1,4 @@
-name: Deploy to AWS Elastic Beanstalk
+name: Deploy to AWS EC2
 
 on:
   push:
@@ -9,25 +9,40 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-    - name: Create ZIP deployment package
+    - name: Set Environment Variables
+      run: |
+        echo "GOOGLE_CREDENTIALS=${{ secrets.GOOGLE_CREDENTIALS }}" >> $GITHUB_ENV
+        echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> $GITHUB_ENV
+        echo "ROBOTNAME=${{ secrets.ROBOTNAME }}" >> $GITHUB_ENV
+        echo "DATABASE_EXCEL_PATH=SCADA TestData.xlsx" >> $GITHUB_ENV
+
+    - name: Create Deployment Package
       run: zip -r deploy.zip . -x '*.git*'
 
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v1
+    - name: Transfer Files to EC2
+      uses: appleboy/scp-action@v0.1.5
       with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: eu-north-1
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_PRIVATE_KEY }}
+        source: "deploy.zip"
+        target: "~/app/"
 
-    - name: Deploy to EB
-      uses: einaregilsson/beanstalk-deploy@v21
+    - name: Run Deployment Script
+      uses: appleboy/ssh-action@v0.1.5
       with:
-        aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        application_name: voice-chatbot
-        environment_name: Voice-chatbot-env-2
-        version_label: ${{ github.sha }}
-        region: eu-north-1
-        deployment_package: deploy.zip
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_PRIVATE_KEY }}
+        script: |
+          sudo yum update -y
+          sudo yum install -y python3 python3-pip python3-virtualenv unzip
+          cd ~/app
+          unzip -o deploy.zip
+          python3 -m venv venv
+          source venv/bin/activate
+          pip install -r requirements.txt
+          nohup python3 app.py &

@@ -44,9 +44,9 @@ class VoiceChatBot:
 
     def _load_excel_data(self):
         try:
-            excel_path = os.getenv('DATABASE_EXCEL_PATH')
-            if not excel_path:
-                self.logger.error("DATABASE_EXCEL_PATH not set")
+            excel_path = os.path.join(os.getcwd(), 'SCADA TestData.xlsx')
+            if not os.path.exists(excel_path):
+                self.logger.error(f"Excel file not found at: {excel_path}")
                 return ""
                 
             df = pd.read_excel(excel_path)
@@ -73,17 +73,17 @@ class VoiceChatBot:
             openai.api_key = os.getenv('OPENAI_API_KEY')
             
             # Verify Google credentials path
-            google_creds_path = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
-            if google_creds_path:
-                if not os.path.exists(google_creds_path):
-                    self.logger.error(f"Google credentials file not found at: {google_creds_path}")
-                else:
-                    self.logger.info("Google credentials file found successfully")
+            google_creds = os.getenv('GOOGLE_CREDENTIALS')
+            if google_creds:
+                self.logger.info("Google credentials loaded successfully")
             else:
-                self.logger.error("GOOGLE_APPLICATION_CREDENTIALS environment variable not set")
+                self.logger.error("GOOGLE_CREDENTIALS environment variable not set")
                 
         except Exception as e:
             self.logger.error(f"Error in setup_environment: {e}")
+
+    # Other class methods (audio_callback, start_listening, etc.) remain unchanged.
+
 
     def audio_callback(self, in_data, frame_count, time_info, status):
         if self.is_listening:
