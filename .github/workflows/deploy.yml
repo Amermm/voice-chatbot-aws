@@ -12,14 +12,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Set Environment Variables
-      run: |
-        echo "GOOGLE_CREDENTIALS=${{ secrets.GOOGLE_CREDENTIALS }}" >> $GITHUB_ENV
-        echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> $GITHUB_ENV
-        echo "ROBOTNAME=${{ secrets.ROBOTNAME }}" >> $GITHUB_ENV
-        echo "DATABASE_EXCEL_PATH=SCADA TestData.xlsx" >> $GITHUB_ENV
-
-    - name: Transfer Files to EC2
+    - name: Set Environment Variables and Transfer Code
       uses: appleboy/scp-action@v0.1.5
       with:
         host: ${{ secrets.EC2_HOST }}
@@ -27,7 +20,20 @@ jobs:
         key: ${{ secrets.EC2_PRIVATE_KEY }}
         source: "."
         target: "~/app"
-
+    
+    - name: Configure Environment Variables on EC2
+      uses: appleboy/ssh-action@v0.1.5
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_PRIVATE_KEY }}
+        script: |
+          echo "export GOOGLE_CREDENTIALS='${{ secrets.GOOGLE_CREDENTIALS }}'" >> ~/.bashrc
+          echo "export OPENAI_API_KEY='${{ secrets.OPENAI_API_KEY }}'" >> ~/.bashrc
+          echo "export ROBOTNAME='${{ secrets.ROBOTNAME }}'" >> ~/.bashrc
+          echo "export DATABASE_EXCEL_PATH='SCADA TestData.xlsx'" >> ~/.bashrc
+          source ~/.bashrc
+    
     - name: Run Deployment Script
       uses: appleboy/ssh-action@v0.1.5
       with:
@@ -41,8 +47,4 @@ jobs:
           python3 -m venv venv
           source venv/bin/activate
           pip install -r requirements.txt
-          export GOOGLE_CREDENTIALS=${GOOGLE_CREDENTIALS}
-          export OPENAI_API_KEY=${OPENAI_API_KEY}
-          export ROBOTNAME=${ROBOTNAME}
-          export DATABASE_EXCEL_PATH=${DATABASE_EXCEL_PATH}
           nohup python3 app.py &
