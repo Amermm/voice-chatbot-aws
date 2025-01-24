@@ -12,7 +12,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Set Environment Variables and Transfer Code
+    - name: Transfer Files to EC2
       uses: appleboy/scp-action@v0.1.5
       with:
         host: ${{ secrets.EC2_HOST }}
@@ -20,7 +20,7 @@ jobs:
         key: ${{ secrets.EC2_PRIVATE_KEY }}
         source: "."
         target: "~/app"
-    
+
     - name: Configure Environment Variables on EC2
       uses: appleboy/ssh-action@v0.1.5
       with:
@@ -33,8 +33,8 @@ jobs:
           echo "export ROBOTNAME='${{ secrets.ROBOTNAME }}'" >> ~/.bashrc
           echo "export DATABASE_EXCEL_PATH='SCADA TestData.xlsx'" >> ~/.bashrc
           source ~/.bashrc
-    
-    - name: Run Deployment Script
+
+    - name: Install Dependencies and Start App
       uses: appleboy/ssh-action@v0.1.5
       with:
         host: ${{ secrets.EC2_HOST }}
