@@ -1,7 +1,26 @@
 from flask import Blueprint, current_app
 
+# Create a Flask Blueprint
 bp = Blueprint('main', __name__)
 
 @bp.route('/')
-def health_check():
-    return f"Config loaded successfully: {current_app.config['ROBOT_NAME']}"
+def home():
+    """Default route to verify the app is running."""
+    robot_name = current_app.config.get('ROBOT_NAME', 'Unknown')
+    return f"Config loaded successfully: {robot_name}"
+
+@bp.route('/status')
+def status():
+    """Status route to check app health."""
+    return {"status": "App is running", "version": "1.0"}
+
+@bp.route('/config')
+def config():
+    """Route to display app configuration (for debugging)."""
+    config = {
+        'DATABASE_PATH': current_app.config.get('DATABASE_PATH'),
+        'GOOGLE_CREDS': current_app.config.get('GOOGLE_CREDS'),
+        'OPENAI_KEY': current_app.config.get('OPENAI_KEY'),
+        'ROBOT_NAME': current_app.config.get('ROBOT_NAME'),
+    }
+    return config
