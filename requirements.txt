@@ -13,10 +13,9 @@ botocore==1.29.137
 s3transfer==0.6.1
 
 # Audio Processing
-# Note: Install PyAudio separately
 google-cloud-speech==2.21.0
 pyttsx3==2.90
-PyAudio==0.2.13
+sounddevice==0.4.6
 
 # AI/ML
 openai==0.27.0
