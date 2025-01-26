@@ -3,7 +3,7 @@ from flask import Flask
 
 def create_app():
     """Factory function to create and configure the Flask app."""
-    app = Flask(__name__)
+    app = Flask(__name__, template_folder='templates')
 
     # Load configuration from environment variables
     app.config.update({
