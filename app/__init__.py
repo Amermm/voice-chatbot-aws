@@ -2,7 +2,7 @@ import os
 from flask import Flask
 
 def create_app():
-    """Factory function with armored initialization"""
+    """Factory function to create and configure the Flask app."""
     app = Flask(__name__)
 
     # Load configuration from environment variables
@@ -13,18 +13,14 @@ def create_app():
         'ROBOT_NAME': os.getenv('ROBOTNAME', 'DefaultBot')
     })
 
-    # Validate critical environment variables
-    if not app.config['GOOGLE_CREDS']:
-        raise RuntimeError("GOOGLE_CREDENTIALS environment variable is missing.")
-    if not app.config['OPENAI_KEY']:
-        raise RuntimeError("OPENAI_API_KEY environment variable is missing.")
+    # Debug log to confirm app creation
+    print("DEBUG: Flask app created and configuration loaded.")
 
-    # Check if the database file exists
-    if not os.path.exists(app.config['DATABASE_PATH']):
-        raise FileNotFoundError(f"Database file not found at: {app.config['DATABASE_PATH']}")
-
-    # Import and register routes after configuration is loaded
+    # Import and register routes
     from .routes import bp
     app.register_blueprint(bp)
+
+    # Debug log to confirm blueprint registration
+    print("DEBUG: Blueprint 'main' registered.")
 
     return app
