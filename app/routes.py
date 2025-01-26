@@ -6,8 +6,9 @@ bp = Blueprint('main', __name__)
 @bp.route('/')
 def home():
     """Render the home page with robot name."""
+    print("DEBUG: Entered the '/' route in routes.py")
     robot_name = current_app.config.get('ROBOT_NAME', 'Unknown')
-    print(f"DEBUG: Robot name is {robot_name}")
+    print(f"DEBUG: Robot name in '/' route is {robot_name}")
     return render_template('index.html', robot_name=robot_name)
 
 @bp.route('/status')
