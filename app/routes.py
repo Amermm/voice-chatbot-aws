@@ -1,13 +1,13 @@
-from flask import Blueprint, current_app
+from flask import Blueprint, render_template, current_app
 
 # Create a Flask Blueprint
 bp = Blueprint('main', __name__)
 
 @bp.route('/')
 def home():
-    """Default route to verify the app is running."""
+    """Render the home page with robot name."""
     robot_name = current_app.config.get('ROBOT_NAME', 'Unknown')
-    return f"Config loaded successfully: {robot_name}"
+    return render_template('index.html', robot_name=robot_name)
 
 @bp.route('/status')
 def status():
@@ -20,7 +20,7 @@ def config():
     config = {
         'DATABASE_PATH': current_app.config.get('DATABASE_PATH'),
         'GOOGLE_CREDS': current_app.config.get('GOOGLE_CREDS'),
-        'OPENAI_KEY': current_app.config.get('OPENAI_KEY'),
+        'OPENAI_KEY': current_app.config.get('OPENAI_API_KEY'),
         'ROBOT_NAME': current_app.config.get('ROBOT_NAME'),
     }
     return config
