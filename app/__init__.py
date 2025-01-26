@@ -3,7 +3,7 @@ from flask import Flask
 
 def create_app():
     """Factory function to create and configure the Flask app."""
-    app = Flask(__name__, template_folder='templates')
+    app = Flask(__name__)
 
     # Load configuration from environment variables
     app.config.update({
@@ -13,14 +13,21 @@ def create_app():
         'ROBOT_NAME': os.getenv('ROBOTNAME', 'DefaultBot')
     })
 
-    # Debug log to confirm app creation
+    # Debugging: Log the configuration
     print("DEBUG: Flask app created and configuration loaded.")
+    print(f"DEBUG: DATABASE_PATH={app.config.get('DATABASE_PATH')}")
+    print(f"DEBUG: GOOGLE_CREDS={app.config.get('GOOGLE_CREDS')}")
+    print(f"DEBUG: OPENAI_KEY={app.config.get('OPENAI_KEY')}")
+    print(f"DEBUG: ROBOT_NAME={app.config.get('ROBOT_NAME')}")
+
+    # Debugging: Log template search paths
+    print(f"DEBUG: Template search paths are {app.jinja_loader.searchpath}")
 
     # Import and register routes
     from .routes import bp
     app.register_blueprint(bp)
 
-    # Debug log to confirm blueprint registration
+    # Debugging: Confirm blueprint registration
     print("DEBUG: Blueprint 'main' registered.")
 
     return app
