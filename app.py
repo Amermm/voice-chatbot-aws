@@ -11,4 +11,5 @@ app = create_app()
 
 if __name__ == '__main__':
     print("Running app.py from:", __file__)  # Print before starting the ap
+    logging.debug("Binding to host 0.0.0.0 on port 8080...")
     app.run(host='0.0.0.0', port=8080, debug=True)
