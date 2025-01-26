@@ -1,11 +1,14 @@
-from app import create_app 
+from app import create_app
 import logging
-logging.basicConfig(level=logging.DEBUG)
 
+
+# Configure logging
+logging.basicConfig(level=logging.DEBUG)
+logging.debug("Starting Flask application...")
+
+# Create the Flask app
 app = create_app()
 
 if __name__ == '__main__':
-    # Use port 8080 instead of the default 5000
+    print("Running app.py from:", __file__)  # Print before starting the ap
     app.run(host='0.0.0.0', port=8080, debug=True)
-
-    print("Running app.py from:", __file__)
